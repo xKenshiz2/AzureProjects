@@ -202,4 +202,27 @@ Log 5/12:
         saying I Coudln't parse the file. Before it was because of the "$" and "%". This should fix it.
 
     Final Statements:
-        - 
+        - N/a
+
+--------------------
+--------------------
+Log 09/14/25:
+    Summary:
+        - This log will cover the past week updates
+        - Finalized CLI version of BudgetBuddy moved onto creating a GUI interface.
+        - Went through countless errors and compilation issues, however, base program is functional and has the same functions as the CLI version.
+        - Interface is still under development (no personlization to the application)
+        - Good to be back :>
+    
+    Changes made:
+        - Divided the main BudgetBuddy.java class into 3 parts (BudgetBuddy.java (then later replaced by the GUI version), StorageManager.java, and Transaction.java)
+        Names are self-explanatory.
+        - Changed File saving method into CSV format:
+            - userData.txt and expenseFile.txt were replaced by categories.txt, income.txt, and transaction.txt.
+        - Deleted UserDataUpdater.java (unecessary)
+    
+    Goals:
+        - Hope to improve GUI interface for better readability, design, and user experience
+        - Start thinking about how to make BudgetBuddy different than other budgeting apps
+        - Delete BudgetBuddy.java at some point (CLI is no longer needed)
+        - Start thinking about creating a web-based application instead of just running off my local computer
