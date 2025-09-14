@@ -1,6 +1,0 @@
-Income:400.0
-Balance:370.0
-Tuition:0.0
-Savings:0.0
-Bills:0.0
-Free Spending:0.0
