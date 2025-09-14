@@ -1,80 +1,107 @@
 import java.io.*;
 import java.util.*;
-import javax.swing.DefaultListModel;
 
 public class StorageManager {
-    private static final String USER_FILE = "userData.txt";
-    private static final String TRANSACTION_FILE = "transactions.txt";
     private static final String CATEGORY_FILE = "categories.txt";
+    private static final String TRANSACTION_FILE = "transactions.txt";
+    private static final String INCOME_FILE = "income.txt";
 
-    // Load income and balance
-    public static double[] loadUser() throws IOException {
-        double income = 0.0;
-        double balance = 0.0;
-        Map<String, Double> categories = new LinkedHashMap<>();
-        File file = new File(USER_FILE);
-        if (!file.exists()) {
-            saveUser(0, 0, categories);
-        }
-        try (BufferedReader br = new BufferedReader(new FileReader(USER_FILE))) {
+    // Load categories as a LinkedHashMap (preserves insertion order)
+    public Map<String, Double> loadCategories() {
+        Map<String, Double> map = new LinkedHashMap<>();
+        File f = new File(CATEGORY_FILE);
+        if (!f.exists()) return map;
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             String line;
             while ((line = br.readLine()) != null) {
-                if (line.startsWith("Income:")) income = Double.parseDouble(line.split(":")[1]);
-                else if (line.startsWith("Balance:")) balance = Double.parseDouble(line.split(":")[1]);
+                if (line.isBlank()) continue;
+                String[] parts = line.split(",", 2);
+                if (parts.length == 2) {
+                    try {
+                        double pct = Double.parseDouble(parts[1]);
+                        map.put(parts[0], pct);
+                    } catch (NumberFormatException ignored) { }
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return new double[]{income, balance};
+        return map;
     }
 
-    public static void saveUser(double income, double balance, Map<String, Double> categories) throws IOException {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(USER_FILE))) {
-            bw.write("Income:" + income + "\n");
-            bw.write("Balance:" + balance + "\n");
-            for (String cat : categories.keySet()) {
-                bw.write(cat + ":" + categories.get(cat) + "\n");
+    public void saveCategories(Map<String, Double> categories) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(CATEGORY_FILE))) {
+            for (Map.Entry<String, Double> e : categories.entrySet()) {
+                bw.write(e.getKey() + "," + e.getValue());
+                bw.newLine();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    // Transactions
-    public static List<Transaction> loadTransactions() throws IOException {
+    // Transactions (overwrite file with full list)
+    public List<Transaction> loadTransactions() {
         List<Transaction> list = new ArrayList<>();
-        File file = new File(TRANSACTION_FILE);
-        if (!file.exists()) file.createNewFile();
-        try (BufferedReader br = new BufferedReader(new FileReader(TRANSACTION_FILE))) {
+        File f = new File(TRANSACTION_FILE);
+        if (!f.exists()) return list;
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             String line;
             while ((line = br.readLine()) != null) {
-                list.add(Transaction.fromCSV(line));
+                if (line.isBlank()) continue;
+                try {
+                    list.add(Transaction.fromCSV(line));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return list;
     }
 
-    public static void saveTransaction(Transaction tx) throws IOException {
+    public void saveTransactions(List<Transaction> transactions) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(TRANSACTION_FILE))) {
+            for (Transaction t : transactions) {
+                bw.write(t.toCSV());
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Append single transaction (optional convenience)
+    public void appendTransaction(Transaction tx) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(TRANSACTION_FILE, true))) {
-            bw.write(tx.toCSV() + "\n");
+            bw.write(tx.toCSV());
+            bw.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    // Categories
-    public static DefaultListModel<String> loadCategories() throws IOException {
-        DefaultListModel<String> model = new DefaultListModel<>();
-        File file = new File(CATEGORY_FILE);
-        if (!file.exists()) file.createNewFile();
-        try (BufferedReader br = new BufferedReader(new FileReader(CATEGORY_FILE))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                model.addElement(line);
+    // Income persistence (simple single-number file)
+    public double loadIncome() {
+        File f = new File(INCOME_FILE);
+        if (!f.exists()) return 0.0;
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String line = br.readLine();
+            if (line != null && !line.isBlank()) {
+                return Double.parseDouble(line.trim());
             }
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
         }
-        return model;
+        return 0.0;
     }
 
-    public static void saveCategories(DefaultListModel<String> model) throws IOException {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(CATEGORY_FILE))) {
-            for (int i = 0; i < model.size(); i++) {
-                bw.write(model.get(i) + "\n");
-            }
+    public void saveIncome(double income) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(INCOME_FILE))) {
+            bw.write(Double.toString(income));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

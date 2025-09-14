@@ -1,0 +1,4 @@
+Tuition,50.0
+Savings,20.0
+Bills,20.0
+Free Spending,10.0

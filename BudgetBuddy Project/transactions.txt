@@ -1,0 +1,3 @@
+2025-09-14T14:38:45.3968519,Tuition,Fall 2025 Tuition Payment,1534.0
+2025-09-14T14:39:02.2440636,Bills,Phone Bill,32.91
+2025-09-14T14:39:14.7736343,Free Spending,Starbucks,12.0

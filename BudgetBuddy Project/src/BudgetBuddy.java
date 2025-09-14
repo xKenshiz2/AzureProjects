@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+// OUTDATED: This is a simple console-based budget management application.
 public class BudgetBuddy {
 
     private static Scanner scan = new Scanner(System.in);
