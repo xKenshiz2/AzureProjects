@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Azure projects
 
 A collection of personal projects
